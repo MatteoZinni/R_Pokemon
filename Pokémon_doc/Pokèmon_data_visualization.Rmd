@@ -1,0 +1,52 @@
+---
+title: "Pokèmon Data Visualization"
+author: "Zinni Matteo"
+date: ""
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r reading dataset, include=FALSE}
+pokemon = read.csv(file.choose(), dec = ".", quote = "\"")
+pokemon = pokemon[,-1]
+```
+
+## Introducing the dataset
+The Pokèmon dataset include `r dim(pokemon)[1]`
+
+
+```{r edit df, include=FALSE}
+#remove japanese name column
+pokemon = pokemon[,-29]
+
+# make the the first letter capital
+headers = gsub("(?<=^|_)([a-z])", "\\U\\1", colnames(pokemon), perl=TRUE)
+
+# replace headers
+colnames(pokemon) = headers
+
+# edit some variables names to look smarter
+colnames(pokemon)[27] <- "Height_m"
+colnames(pokemon)[35] <- "Type_1"
+colnames(pokemon)[36] <- "Type_2"
+
+# edit generation name to display roman numeral
+Generation = factor(pokemon$Generation, levels=c(1:7), labels = as.roman(c(1:7)))
+
+# replace column
+pokemon$Generation <- Generation
+```
+
+
+```{r check head df, echo=FALSE}
+knitr::kable(pokemon)
+```
+
+
+
+
+

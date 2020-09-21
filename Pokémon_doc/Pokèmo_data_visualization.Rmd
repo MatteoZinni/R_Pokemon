@@ -1,0 +1,54 @@
+---
+title: "Pokèmon Data Visualization"
+author: "Zinni Matteo"
+date: "20/9/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## introducing the dataset
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+
+```{r reading dataset, include=FALSE}
+pokemon = read.csv(file.choose(), dec = ".", quote = "\"")
+pokemon = pokemon[,-1]
+```
+
+```{r edit df, include=FALSE}
+#remove japanese name column
+pokemon = pokemon[,-29]
+
+# make the the first letter capital
+headers = gsub("(?<=^|_)([a-z])", "\\U\\1", colnames(pokemon), perl=TRUE)
+
+# replace headers
+colnames(pokemon) = headers
+
+# edit some variables names to look smarter
+colnames(pokemon)[27] <- "Height_m"
+colnames(pokemon)[35] <- "Type_1"
+colnames(pokemon)[36] <- "Type_2"
+
+# edit generation name to display roman numeral
+Generation = factor(pokemon$Generation, levels=c(1:7), labels = as.roman(c(1:7)))
+
+# replace column
+pokemon$Generation <- Generation
+```
+
+
+```{r check head df, echo=FALSE}
+knitr::kable(pokemon)
+```
+
+
+
+
+
