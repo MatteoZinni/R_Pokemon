@@ -16,7 +16,7 @@ pokemon = pokemon[,-1]
 ```
 
 ## Introducing the dataset
-The Pokèmon dataset include `r dim(pokemon)[1]`
+The Complete Pokemon Dataset includes `r dim(pokemon)[1]`. The original version is available for free download at
 
 
 ```{r edit df, include=FALSE}
