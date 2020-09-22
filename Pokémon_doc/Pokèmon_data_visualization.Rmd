@@ -1,5 +1,5 @@
 ---
-title: "Pokèmon Data Visualization"
+title: "**01 Pokèmon Data Visualization with R**"
 author: "Zinni Matteo"
 date: ""
 output: html_document
@@ -15,8 +15,12 @@ pokemon = read.csv(file.choose(), dec = ".", quote = "\"")
 pokemon = pokemon[,-1]
 ```
 
-## Introducing the dataset
-The Complete Pokemon Dataset includes `r dim(pokemon)[1]`. The original version is available for free download at
+## Background
+The Complete Pokemon Dataset includes `r dim(pokemon)[1]` Pokèmon and `r dim(pokemon)[2]` variables from 7 generations (1996-2019). Features refer only to Pokèmon video games and not to other products such as Pokèmon GO or trading card game. The original version is available for free download at [Kaggle](https://www.kaggle.com/rounakbanik/pokemon).
+
+## Objective
+The first project within Pokémon data science is focused on data visualization as a powerful tool to give a first overview of data for further analysis. The dataset represent an interesting opportunity to display both quantitative (continuous and discrete) and qualitative variables.  
+
 
 
 ```{r edit df, include=FALSE}
