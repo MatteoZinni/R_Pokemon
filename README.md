@@ -10,6 +10,7 @@
 - [1.2.0 Data preparation](#Data-preparation)
     - [1.2.1 Coordinates](#Features-editing)
     - [1.2.2 Data cleaning](#Data-cleaning)
+    - [1.2.3 Data engineering](#Data-enginering)
 <!--te-->
 
 ## Introducing Pokémon
