@@ -9,48 +9,207 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
+```{r loading libraries, echo=FALSE}
+library(ggplot2)
+```
+
+
+
+```{r function folder, include=FALSE}
+# set functions folder
+functions_folder = "F:/Users/matte/Documents/data_science/data_science_r_projects/r_projects_Pokémon/R_Pokemon/Pokémon_functions"
+```
 
 ```{r reading dataset, include=FALSE}
 pokemon = read.csv(file.choose(), dec = ".", quote = "\"")
-pokemon = pokemon[,-1]
 ```
 
 ## Background
 The Complete Pokemon Dataset includes `r dim(pokemon)[1]` Pokèmon and `r dim(pokemon)[2]` variables from 7 generations (1996-2019). Features refer only to Pokèmon video games and not to other products such as Pokèmon GO or trading card game. The original version is available for free download at [Kaggle](https://www.kaggle.com/rounakbanik/pokemon).
 
 ## Objective
-The first project within Pokémon data science is focused on data visualization as a powerful tool to give a first overview of data for further analysis. The dataset represent an interesting opportunity to display both quantitative (continuous and discrete) and qualitative variables.  
+The first project within Pokémon data science is focused on data visualization as a powerful tool to give a first overview of data for further analysis. The dataset represent an interesting opportunity to display both quantitative (continuous and discrete) and qualitative variables. In this project several questions will be graphically answered.
 
+- Which region host the greatest number of Pokémon?
+- Which is the most abundant Pokémon type?
+- Is the type composition over region homogeneous?
+- Which continuous variables are positive correlated and which are negative correlated?
+
+## Data cleaning
+Since some variables can be considered useless for this project two column have been removed
+
+```{r data cleaning, echo=TRUE}
+# remove ability column
+pokemon = pokemon[,-1]
+
+# remove japanese name column
+pokemon = pokemon[,-29]
+```
 
 
 ```{r edit df, include=FALSE}
-#remove japanese name column
-pokemon = pokemon[,-29]
+# data editing
 
 # make the the first letter capital
 headers = gsub("(?<=^|_)([a-z])", "\\U\\1", colnames(pokemon), perl=TRUE)
 
-# replace headers
+# replace headers with new ones
 colnames(pokemon) = headers
 
-# edit some variables names to look smarter
+# edit some variables names to look consistent
 colnames(pokemon)[27] <- "Height_m"
 colnames(pokemon)[35] <- "Type_1"
 colnames(pokemon)[36] <- "Type_2"
 
-# edit generation name to display roman numeral
+# Replace generation number with a more smart roman numeral
+
+# edit generation header
 Generation = factor(pokemon$Generation, levels=c(1:7), labels = as.roman(c(1:7)))
 
-# replace column
+# replace the old column
 pokemon$Generation <- Generation
 ```
 
+## Feature engineering
+Since each Pokèmon generation belong to a different region a new feature (Region) have been creating sourcing a function that is store in the local project folder. The function makes a double check on the `r colnames(pokemon[31])` number and on the `r colnames(pokemon[38])` to which the Pokémon belongs to assign the proper region name. 
 
-```{r check head df, echo=FALSE}
-knitr::kable(pokemon)
+```{r feature engineering, include=FALSE}
+# sourcing 
+source(paste(functions_folder, "pokemon_functions.R", sep = '/'))
+```
+
+```{r display created feature, echo=TRUE}
+
+# running function
+pokemon$Region = as.factor(assign_region(pokemon))
+
+# check levels (must be 7 just like generations)
+levels(pokemon$Region)
+```
+
+## Data Visualization: discrete variable
+The firs part of this project will be focused on discrete variables for which barplot represent the best choice to give some nice data visualization
+
+### Overall abundance by regions
+We want first explore the overall Pokèmon abundance. Since we will we use ggplot2 package we need to first make a table that reports the number of pokèmon for each region.
+
+```{r table of pokèmon by region, echo=TRUE}
+
+# creating fist a df to pass to ggplot function
+region_df = as.data.frame(table(pokemon$Region, dnn = "Region"), responseName = "Abundance")
+
+print(region_df)
+```
+
+```{r plot number of pokèmon by region, echo=TRUE}
+
+# creating fist a df to pass to ggplot function
+ggplot(data=region_df, aes(x= reorder(Region, Abundance), y=Abundance, fill=Region)) +     
+  geom_bar(stat="identity") +
+  geom_text(aes(label=Abundance), vjust=1.6, color="Black", size=3.5) +
+  xlab(label = "Regions") +
+  ylab(label = "Number of Pokémon") +
+  ggtitle(label = "Pokémon abundance by Region") +
+  theme(plot.title = element_text(hjust = 0.5))
+```
+
+### Pokèmon type and composition by regions
+Types refer to different elemental properties associated with both Pokémon and their moves. Each type has its own strengths and weaknesses, most of which are logical setups. Pokémon  can have up to two types while their moves can only be one type. Let's first consider Type_1 and then Type_2. It's important to keep in mind that Type 2 may be not present: to overcome this features new level "None" for the variable Type_2 has been introduced.
+
+```{r build type_1df, include=FALSE}
+
+# type 1 
+type_1_df = as.data.frame(table(pokemon$Type_1,pokemon$Region, dnn = c("Type_1", "Region")), responseName = "Abundance")
+
+# make first letter uppercase
+type_1_df$Type_1 = as.factor(gsub("(?<=^|_)([a-z])", "\\U\\1", type_1_df$Type_1, perl=TRUE))
+```
+
+```{r print type_1 df, echo=TRUE}
+# Type_1 dataframe
+knitr::kable(head(type_1_df))
 ```
 
 
+```{r plot Type_1, echo=TRUE}
 
+# creating color vector with proper color
+pokemon_type_1_color = c("yellowgreen", "gray25", "lightslateblue", "orange", "orchid1", "chocolate4", "red1", "steelblue2", "royalblue3","chartreuse2", "lightgoldenrod3", "cadetblue1", "cornsilk3", "magenta4","maroon2", "khaki4", "grey69", "dodgerblue" )
 
+# plot
+ggplot(type_1_df, aes(y = Abundance, x = Type_1 , fill = Type_1 )) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5), plot.title = element_text(hjust = 0.5))+
+  guides(fill=guide_legend(title="Type 1")) + 
+  geom_bar(stat = 'identity') + facet_grid(Region ~.) + 
+  labs(title = "Type Of Pokémon Over Regions",x="Type",y="Number of Pokèmon") +
+  scale_fill_manual(values = pokemon_type_1_color)
+```
 
+```{r build type_2 df, include=FALSE}
+# type 2: it can also be null
+type_2_df = as.data.frame(table(pokemon$Type_2,pokemon$Region, dnn = c("Type_2", "Region")), responseName = "Abundance")
+
+# assign "none" level to null
+levels(type_2_df$Type_2)[1] <- "none"
+
+# make first letter uppercase
+type_2_df$Type_2 = as.factor(gsub("(?<=^|_)([a-z])", "\\U\\1", type_2_df$Type_2, perl=TRUE))
+
+# check Type_2 levels
+levels(type_2_df$Type_2)
+```
+
+```{r print type_2 df, echo=TRUE}
+# Type_2 dataframe
+knitr::kable(head(type_2_df))
+```
+
+```{r color setting for Type_2, echo=TRUE}
+# creating color vector with proper color
+pokemon_type_2_color = c("yellowgreen", "gray25", "lightslateblue", "orange", "orchid1", "chocolate4", "red1", "steelblue2", "royalblue3", "chartreuse2", "lightgoldenrod3", "cadetblue1", "slategray","cornsilk3", "magenta4","maroon2", "khaki4", "grey69", "dodgerblue" )
+```
+
+```{r plot Type_2, echo=TRUE}
+# plot
+ggplot(type_2_df, aes(y = Abundance, x = Type_2 , fill = Type_2 )) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5), plot.title = element_text(hjust = 0.5))+
+  guides(fill=guide_legend(title="Type 2")) + 
+  geom_bar(stat = 'identity') + facet_grid(Region ~.) + 
+  labs(title = "Type Of Pokémon Over Regions",x="Type",y="Number of Pokèmon") +
+  scale_fill_manual(values = pokemon_type_2_color)
+```
+
+Since the number of pokémon differs among region, to have a more accurate overview of the Type the use of  relative percentage could be more meaningfull.
+
+```{r Type_1 relative percentage, echo=TRUE}
+# calculating relative percentage of type composition (Type 1)
+type_1_df$Relative_abundance = round(((type_1_df$Abundance/rep(region_df$Abundance, each = length(levels(type_1_df$Type_1))))*100),2)
+
+# check df
+knitr::kable(head(type_1_df))
+```
+
+```{r plot Type_1 relative percentage, echo=TRUE}
+# plot
+ggplot(type_1_df, aes(y = Relative_abundance, x = Type_1 , fill = Type_1 )) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5), plot.title = element_text(hjust = 0.5))+
+  guides(fill=guide_legend(title="Type 1")) + 
+  geom_bar(stat = 'identity') + facet_grid(Region ~.) + 
+  labs(title = "Type Of Pokémon Over Regions",x="Type",y="Type composition as percentage") +
+  scale_fill_manual(values = pokemon_type_1_color)
+```
+
+```{r Type_2 relative percentage, echo=TRUE}
+# calculating relative percentage of type composition (Type 2)
+type_2_df$Relative_abundance = round(((type_2_df$Abundance/rep(region_df$Abundance, each = length(levels(type_2_df$Type_2))))*100),2)
+```
+
+```{r plot Type_2 relative percentage, echo=TRUE}
+# plot
+ggplot(type_2_df, aes(y = Relative_abundance, x = Type_2 , fill = Type_2 )) + 
+  theme(axis.text.x = element_text(angle = 45, vjust = 0.5, hjust=0.5), plot.title = element_text(hjust = 0.5))+
+  guides(fill=guide_legend(title="Type 2")) + 
+  geom_bar(stat = 'identity') + facet_grid(Region ~.) + 
+  labs(title = "Type Of Pokémon Over Regions",x="Type",y="Type composition as percentage") +
+  scale_fill_manual(values = pokemon_type_2_color)
+```
