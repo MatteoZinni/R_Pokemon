@@ -42,7 +42,7 @@ The dataset contains 801 Pokèmon from 7 generations (1996-2019) and 45 variable
 | sp_attack         | The Base Special Attack of the Pokemon |
 | sp_defense        | The Base Special Defense of the Pokemon|
 | speed             | The Base Speed of the Pokemon|
-| generation        |The numbered generation which the Pokemon was first introduced |
+| generation        | The numbered generation which the Pokemon was first introduced |
 | is_legendary      | Denotes if the Pokemon is legendary |
 
 ## Data preparation
