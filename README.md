@@ -9,7 +9,7 @@
 - [1.1.0 The dataset](#The_dataset)
 - [1.2.0 Data preparation](#Data-preparation)
     - [1.2.1 Coordinates](#Features-editing)
-    - [1.2.2 Data cleaning: missing data](#Data-cleaning:-missing-data)
+    - [1.2.2 Data cleaning](#Data-cleaning)
 <!--te-->
 
 ## Introducing Pokémon
@@ -58,7 +58,7 @@ Data preparation includes several steps aimed to improve  the overall quality of
 * Split ```Ability``` to obtain one column for each
 * The ```Capture_rate``` should be a numeric values while is being classed as a factor. The reason lies in the capture rate of ```Minior``` (number 774): this type Pokémon appears to have a different capture rate under different conditions. In our data the actual capture rate for this Pokémon is ```30 (Meteorite)255 (Core)```. Based on the [Pokedex](https://pokemondb.net/pokedex) description, the canonical value is 30 for its Meteorite form, so we will use this after have converted all rate as factors and replace the wrong one. Aftwer this passage data can be and converted into numeric.
 
-### Data cleaning: missing data
+### Data cleaning
 We need first to check the consistency of the data to ensure that there are no missing values: if some missing are present we cand decide to use our knowledge to replace them or simply not to consider entries with missing values. With only 20 Pokémon (18 of which from the first generation) with no ```Height``` nor ```Weight``` the dataset seems to be a fairly complete data set. There are also 98 Pokémon for ```Percentage_male``` value is missing. Since this issue seems not to depend from any factor, after a quick check in the [Pokedex](https://pokemondb.net/pokedex) we could learn that these are genderless Pokémon (this explain the missing values). A reasonable choise could be to set this values at 0.5, representing an equal spit bewteen male and female.
 
 ### Data engineering 
